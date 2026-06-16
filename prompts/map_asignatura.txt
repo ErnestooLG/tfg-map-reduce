@@ -4,9 +4,14 @@ Pregunta: ¿esta asignatura tiene simultáneamente examen final con peso superio
 
 Criterio:
 - "examen_final_mayor_40" = "si" solo si el examen final, examen escrito, prueba final o exámenes equivalentes superan el 40% de la nota.
+- Si aparece una prueba global, final o extraordinaria con 50%, 60%, 70%, 100%, etc., cuenta como examen final >40%.
+- "porcentaje_examen" debe indicar el porcentaje exacto encontrado. Si hay varios porcentajes relevantes, ponlos de forma breve.
 - "practicas_obligatorias" = "si" solo si las prácticas, laboratorio o proyecto práctico son obligatorios o necesarios para aprobar, presentarse o promediar.
+- "cumple_ambas_condiciones" = "si" solo si las dos condiciones anteriores son "si". Si alguna es "no", responde "no". Si falta información importante, responde "dudoso".
 - Si no está claro, responde "dudoso". Es mejor dejarlo dudoso que inventar.
+- Usa "no" solo cuando el documento deje claro que la condición no se cumple. Si el documento no lo dice o no lo encuentras, usa "dudoso".
 - Si hay un trabajo o proyecto, pero no está claro que sea una práctica obligatoria, explícalo en observaciones.
+- "evidencia" debe ser breve: máximo dos frases con los datos clave, sin copiar párrafos largos.
 
 Devuelve SOLO JSON válido con estos campos:
 {
@@ -14,7 +19,7 @@ Devuelve SOLO JSON válido con estos campos:
   "examen_final_mayor_40": "si/no/dudoso",
   "porcentaje_examen": "",
   "practicas_obligatorias": "si/no/dudoso",
+  "cumple_ambas_condiciones": "si/no/dudoso",
   "evidencia": "",
-  "cumple": "si/no/dudoso",
   "observaciones": ""
 }

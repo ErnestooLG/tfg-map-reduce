@@ -1,12 +1,12 @@
 """
-Piloto mínimo map-reduce
+Piloto sencillo de map-reduce para el TFG.
 
-La idea es hacerlo lo más simple posible:
+El flujo es:
 1. Buscar los PDFs de asignaturas.
-2. Preguntar a Gemini por cada asignatura por separado (fase map).
-3. Juntar los resultados en un resumen final (fase reduce).
+2. Analizar cada PDF por separado.
+3. Juntar los resultados en un resumen final.
 
-No se mete ninguna API key en el código. La clave se lee desde un archivo .env.
+La clave de Gemini se lee desde .env para no dejarla escrita en el código.
 """
 
 import argparse
@@ -25,13 +25,13 @@ RESULTS_DIR = Path("outputs/resultados")
 
 
 def read_config():
-    """Lee config.yaml, donde están las rutas y el modelo."""
+    """Lee las rutas, la pregunta y el modelo desde config.yaml."""
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def read_text(path):
-    """Lee un archivo de texto, normalmente un prompt."""
+    """Lee un archivo de texto."""
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
@@ -62,7 +62,7 @@ def find_pdfs(root):
 
 
 def save_inventory(items):
-    """Guarda el inventario de PDFs para poder comprobar qué se va a procesar."""
+    """Guarda un inventario para revisar qué PDFs se han encontrado."""
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     path = RESULTS_DIR / "inventario.csv"
 
@@ -75,7 +75,7 @@ def save_inventory(items):
 
 
 def get_gemini_client():
-    """Crea el cliente de Gemini. Si no hay clave, avisa claro."""
+    """Crea el cliente de Gemini leyendo la clave desde .env."""
     load_dotenv()
 
     if not os.getenv("GEMINI_API_KEY"):
@@ -89,7 +89,7 @@ def get_gemini_client():
 
 
 def wait_file_ready(client, uploaded_file, max_wait_seconds=60):
-    """Espera a que Gemini termine de procesar el PDF subido."""
+    """Espera a que Gemini termine de preparar el PDF subido."""
     file_name = getattr(uploaded_file, "name", None)
     if not file_name:
         return uploaded_file
@@ -128,22 +128,80 @@ def extract_json(text):
 
 
 def ask_gemini_map(client, model, pdf_path, prompt):
-    """Sube un PDF y pregunta a Gemini solo por esa asignatura."""
+    """Sube un PDF y lo analiza de forma individual."""
+    from google.genai import types
+
     uploaded_file = client.files.upload(file=str(pdf_path))
     uploaded_file = wait_file_ready(client, uploaded_file)
 
     response = client.models.generate_content(
         model=model,
-        contents=[prompt, uploaded_file],
+        contents=[f"{prompt}\n\nPDF analizado: {Path(pdf_path).name}", uploaded_file],
+        config=types.GenerateContentConfig(
+            temperature=0,
+            response_mime_type="application/json",
+        ),
     )
 
     return extract_json(response.text)
 
 
+def brief_text(value, max_chars=450):
+    """Acorta textos largos para que el CSV sea fácil de revisar."""
+    text = " ".join(str(value or "").split())
+    if len(text) > max_chars:
+        return text[:max_chars].rstrip() + "..."
+    return text
+
+
+def calculate_cumple(examen_final, practicas):
+    """Calcula el resultado final a partir de las dos condiciones principales."""
+    examen_final = normalize(examen_final)
+    practicas = normalize(practicas)
+
+    if examen_final == "si" and practicas == "si":
+        return "si"
+    if examen_final == "no" or practicas == "no":
+        return "no"
+    return "dudoso"
+
+
+def complete_map_answer(answer, item):
+    """Completa campos mínimos para mantener siempre la misma salida."""
+    if "cumple_ambas_condiciones" not in answer:
+        answer["cumple_ambas_condiciones"] = answer.pop("cumple", "dudoso")
+    else:
+        answer.pop("cumple", None)
+
+    answer.setdefault("asignatura", item["asignatura"])
+    answer.setdefault("examen_final_mayor_40", "dudoso")
+    answer.setdefault("porcentaje_examen", "")
+    answer.setdefault("practicas_obligatorias", "dudoso")
+    answer.setdefault("evidencia", "")
+    answer.setdefault("observaciones", "")
+    calculated = calculate_cumple(
+        answer["examen_final_mayor_40"],
+        answer["practicas_obligatorias"],
+    )
+    original = normalize(answer["cumple_ambas_condiciones"])
+    if original and original != calculated:
+        answer["observaciones"] = (
+            f"{answer['observaciones']} "
+            f"Resultado final recalculado como '{calculated}' "
+            "porque no coincidía con las dos condiciones anteriores."
+        ).strip()
+    answer["cumple_ambas_condiciones"] = calculated
+    answer["evidencia"] = brief_text(answer["evidencia"])
+    answer["observaciones"] = brief_text(answer["observaciones"])
+    answer["curso"] = item["curso"]
+    answer["archivo"] = item["archivo"]
+    return answer
+
+
 def run_map(items, config, limit=None):
-    """Ejecuta la fase map: una llamada a Gemini por cada asignatura."""
+    """Analiza cada asignatura por separado."""
     client = get_gemini_client()
-    model = config.get("modelo", "gemini-2.5-flash")
+    model = config.get("modelo", "gemini-2.5-flash-lite")
     prompt = read_text("prompts/map_asignatura.txt")
 
     if limit:
@@ -157,19 +215,18 @@ def run_map(items, config, limit=None):
         try:
             answer = ask_gemini_map(client, model, item["archivo"], prompt)
         except Exception as error:
-            # Si algo falla, no invento resultado. Lo marco como dudoso para revisarlo.
+            # Si algo falla, lo dejo como dudoso para revisarlo después.
             answer = {
                 "asignatura": item["asignatura"],
                 "examen_final_mayor_40": "dudoso",
                 "porcentaje_examen": "",
                 "practicas_obligatorias": "dudoso",
+                "cumple_ambas_condiciones": "dudoso",
                 "evidencia": "",
-                "cumple": "dudoso",
                 "observaciones": f"Error al procesar: {error}",
             }
 
-        answer["curso"] = item["curso"]
-        answer["archivo"] = item["archivo"]
+        answer = complete_map_answer(answer, item)
         results.append(answer)
         save_map_results(results)
 
@@ -177,7 +234,7 @@ def run_map(items, config, limit=None):
 
 
 def save_map_results(results):
-    """Guarda los resultados map en JSON y CSV."""
+    """Guarda los resultados en JSON y CSV."""
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     json_path = RESULTS_DIR / "resultados_map.json"
@@ -193,8 +250,8 @@ def save_map_results(results):
         "examen_final_mayor_40",
         "porcentaje_examen",
         "practicas_obligatorias",
+        "cumple_ambas_condiciones",
         "evidencia",
-        "cumple",
         "observaciones",
     ]
 
@@ -205,7 +262,7 @@ def save_map_results(results):
 
 
 def load_map_results():
-    """Carga resultados_map.json para poder hacer el reduce."""
+    """Carga los resultados anteriores para hacer el resumen final."""
     path = RESULTS_DIR / "resultados_map.json"
 
     if not path.exists():
@@ -216,12 +273,12 @@ def load_map_results():
 
 
 def normalize(value):
-    """Normaliza respuestas tipo sí/no/dudoso para compararlas mejor."""
+    """Normaliza respuestas tipo sí/no/dudoso."""
     return str(value or "").strip().lower().replace("í", "i")
 
 
 def append_group(lines, title, group):
-    """Añade un grupo de asignaturas al Markdown final."""
+    """Añade un grupo de asignaturas al resumen Markdown."""
     lines.append(f"## {title}\n")
 
     if not group:
@@ -239,14 +296,19 @@ def append_group(lines, title, group):
     lines.append("")
 
 
+def cumple_value(row):
+    """Calcula el valor final desde las dos condiciones base."""
+    return calculate_cumple(
+        row.get("examen_final_mayor_40"),
+        row.get("practicas_obligatorias"),
+    )
+
+
 def local_reduce(results):
-    """
-    Reduce sencillo sin llamar a Gemini.
-    Solo agrupa las asignaturas en cumplen, dudosas y no cumplen.
-    """
-    cumplen = [row for row in results if normalize(row.get("cumple")) == "si"]
-    dudosas = [row for row in results if normalize(row.get("cumple")) == "dudoso"]
-    no_cumplen = [row for row in results if normalize(row.get("cumple")) == "no"]
+    """Agrupa los resultados sin hacer otra llamada a Gemini."""
+    cumplen = [row for row in results if cumple_value(row) == "si"]
+    dudosas = [row for row in results if cumple_value(row) == "dudoso"]
+    no_cumplen = [row for row in results if cumple_value(row) == "no"]
 
     lines = ["# Resultado final map-reduce\n"]
     append_group(lines, "Asignaturas que cumplen ambas condiciones", cumplen)
@@ -264,12 +326,9 @@ def local_reduce(results):
 
 
 def llm_reduce(config, results):
-    """
-    Reduce opcional usando Gemini.
-    Esto encaja con la idea del tutor de juntar las respuestas y pasarlas otra vez al LLM.
-    """
+    """Reduce opcional usando Gemini para redactar una respuesta final."""
     client = get_gemini_client()
-    model = config.get("modelo", "gemini-2.5-flash")
+    model = config.get("modelo", "gemini-2.5-flash-lite")
     prompt = read_text("prompts/reduce_final.txt")
 
     response = client.models.generate_content(
@@ -283,7 +342,7 @@ def llm_reduce(config, results):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Piloto mínimo map-reduce para el TFG")
+    parser = argparse.ArgumentParser(description="Piloto map-reduce para el TFG")
     parser.add_argument("--dry-run", action="store_true", help="Solo genera inventario, sin llamar a Gemini")
     parser.add_argument("--limit", type=int, default=None, help="Procesa solo los primeros N PDFs")
     parser.add_argument("--course", type=str, default=None, help="Filtra por nombre de carpeta de curso")

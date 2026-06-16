@@ -1,5 +1,6 @@
 # Rutas del proyecto.
 # Si cambias de ordenador o mueves las carpetas, solo tienes que modificar esto.
 ruta_pdfs_por_asignatura: "C:/Users/ernes/OneDrive/Desktop/UNI/UPM/5/TFG/Recopilacion documentos para TFG/Todo por cursos"
-modelo: "gemini-2.5-flash"
+# Modelo barato de la familia Flash-Lite para la prueba piloto.
+modelo: "gemini-2.5-flash-lite"
 pregunta: "¿Qué asignaturas tienen simultáneamente examen final >40% y prácticas obligatorias?"

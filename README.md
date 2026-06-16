@@ -1,29 +1,32 @@
 # Piloto map-reduce TFG
 
-Este proyecto es una versión mínima para probar la idea: dividir una pregunta grande en preguntas pequeñas por asignatura y después juntar las respuestas.
+Este proyecto es una primera prueba sencilla de la idea de map-reduce aplicada al TFG. La idea es dividir una pregunta grande en consultas pequeñas por asignatura y después juntar los resultados.
 
-Caso piloto:
+Pregunta piloto:
 
-¿Qué asignaturas tienen simultáneamente examen final >40% y prácticas obligatorias?
+> ¿Qué asignaturas tienen simultáneamente examen final >40% y prácticas obligatorias?
 
-Idea:
+El planteamiento es:
 
-1. Se hace un inventario de los PDFs de asignaturas.
-2. En la fase **map**, se pregunta a Gemini por cada asignatura por separado.
-3. En la fase **reduce**, se juntan los resultados y se separan las asignaturas que cumplen, las dudosas y las que no cumplen.
+1. Hacer un inventario de los PDFs de asignaturas.
+2. Preguntar a Gemini por cada asignatura por separado.
+3. Guardar una salida estructurada.
+4. Juntar los resultados en un resumen final.
 
-## Qué hace cada archivo
+## Archivos principales
 
-- `config.yaml`: guarda las rutas de las carpetas y el modelo de Gemini. Si muevo las carpetas, solo tengo que cambiar este archivo.
-- `.env.example`: plantilla para crear el archivo `.env`, donde irá la API key cuando Javier me la pase.
-- `requirements.txt`: librerías necesarias para ejecutar el script.
-- `run_map_reduce.py`: script principal. Hace el inventario, ejecuta la fase map y genera el reduce final.
-- `prompts/map_asignatura.txt`: prompt que se usa para analizar una asignatura concreta.
-- `prompts/reduce_final.txt`: prompt opcional para que Gemini redacte una respuesta final a partir de los resultados map.
-- `outputs/resultados/`: carpeta donde se guardan el inventario y los resultados.
-- `outputs/memoria/seccion_map_reduce_para_memoria.md`: texto base para copiar en la memoria.
+- `config.yaml`: rutas del proyecto, pregunta piloto y modelo utilizado. Para esta primera prueba se usa `gemini-2.5-flash-lite`.
+- `.env.example` y `.env.template`: ejemplos para crear el archivo `.env` en local.
+- `requirements.txt`: dependencias necesarias.
+- `run_map_reduce.py`: script principal del piloto.
+- `prompts/map_asignatura.txt`: prompt usado para analizar una asignatura.
+- `prompts/reduce_final.txt`: prompt opcional para redactar una respuesta final con Gemini.
+- `outputs/resultados/`: carpeta local donde se guardan los resultados generados.
+- `docs/prueba_inicial_flash_lite.md`: resumen de la primera prueba realizada.
 
 ## Instalación
+
+Desde la carpeta del proyecto:
 
 ```powershell
 cd "C:\Users\ernes\OneDrive\Desktop\UNI\UPM\5\TFG\map_reduce"
@@ -32,59 +35,71 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Probar sin API key
+También se puede ejecutar directamente con el Python del entorno virtual:
 
 ```powershell
-python run_map_reduce.py --dry-run
+.\.venv\Scripts\python.exe run_map_reduce.py --dry-run
 ```
 
-Esto solo comprueba las carpetas y genera el inventario de PDFs. No llama a Gemini.
+## Configurar la clave
 
-## Ejecutar con API key
+La clave real de Gemini va solo en un archivo `.env` local. Ese archivo está incluido en `.gitignore`, así que no debería subirse al repositorio.
 
-Cuando tenga la clave:
+Para crearlo:
 
 ```powershell
-Copy-Item .env.example .env
+Copy-Item .env.template .env
+notepad .env
 ```
 
-Después abro `.env` y pongo:
+Dentro de `.env` debe quedar una línea de este estilo:
 
 ```text
 GEMINI_API_KEY=tu_clave_real
 ```
 
-Primera prueba pequeña:
+No se debe poner la clave en el código, en el README, en los prompts ni en los resultados.
+
+## Prueba sin gastar créditos
+
+Primero se puede comprobar que el script encuentra los PDFs sin llamar a Gemini:
 
 ```powershell
-python run_map_reduce.py --limit 3
+.\.venv\Scripts\python.exe run_map_reduce.py --dry-run
 ```
 
-Ejecución completa:
+Esto genera el inventario de documentos y termina sin hacer llamadas a la API.
+
+## Primera prueba real
+
+Para controlar el coste, la primera prueba real se hace con un solo PDF:
 
 ```powershell
-python run_map_reduce.py
+.\.venv\Scripts\python.exe run_map_reduce.py --limit 1
 ```
 
-Si quiero que Gemini redacte también el reduce final a partir de los resultados:
+Si esa prueba sale razonable, se puede ampliar a tres PDFs:
 
 ```powershell
-python run_map_reduce.py --phase reduce --reduce-llm
+.\.venv\Scripts\python.exe run_map_reduce.py --limit 3
 ```
 
-## Salidas
+De momento no tiene sentido lanzar todos los documentos hasta revisar manualmente los primeros resultados.
 
-El script genera:
+## Salidas generadas
 
-- `outputs/resultados/inventario.csv`
-- `outputs/resultados/resultados_map.csv`
-- `outputs/resultados/resultados_map.json`
-- `outputs/resultados/reduce_final.md`
-- `outputs/resultados/reduce_final_llm.md` si se usa `--reduce-llm`
+El script puede generar estos archivos dentro de `outputs/resultados/`:
 
-## Qué queda pendiente
+- `inventario.csv`
+- `resultados_map.csv`
+- `resultados_map.json`
+- `reduce_final.md`
+- `reduce_final_llm.md`, solo si se usa `--reduce-llm`
 
-- Revisar el prompt con el tutor.
-- Meter la API key real.
-- Ejecutar primero una prueba pequeña.
-- Revisar manualmente los casos dudosos.
+Esa carpeta se deja como salida local de pruebas y no se sube al repositorio.
+
+## Estado actual
+
+Ya se ha hecho una primera prueba con `gemini-2.5-flash-lite` y `--limit 1`. El resumen está en `docs/prueba_inicial_flash_lite.md`.
+
+Lo siguiente sería revisar manualmente ese resultado y, si todo cuadra, repetir la prueba con `--limit 3` antes de ampliar a más asignaturas.
