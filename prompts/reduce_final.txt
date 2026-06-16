@@ -1,0 +1,8 @@
+A partir de los resultados por asignatura, genera una respuesta final breve para la memoria.
+
+Separa la respuesta en tres grupos:
+1. Asignaturas que cumplen claramente ambas condiciones.
+2. Asignaturas dudosas que habría que revisar manualmente.
+3. Asignaturas que no cumplen.
+
+No añadas asignaturas que no aparezcan en los datos de entrada. Si un caso es dudoso, mantenlo como dudoso.

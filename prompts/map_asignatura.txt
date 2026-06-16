@@ -1,0 +1,20 @@
+Analiza SOLO el PDF de esta asignatura.
+
+Pregunta: ¿esta asignatura tiene simultáneamente examen final con peso superior al 40% y prácticas obligatorias?
+
+Criterio:
+- "examen_final_mayor_40" = "si" solo si el examen final, examen escrito, prueba final o exámenes equivalentes superan el 40% de la nota.
+- "practicas_obligatorias" = "si" solo si las prácticas, laboratorio o proyecto práctico son obligatorios o necesarios para aprobar, presentarse o promediar.
+- Si no está claro, responde "dudoso". Es mejor dejarlo dudoso que inventar.
+- Si hay un trabajo o proyecto, pero no está claro que sea una práctica obligatoria, explícalo en observaciones.
+
+Devuelve SOLO JSON válido con estos campos:
+{
+  "asignatura": "",
+  "examen_final_mayor_40": "si/no/dudoso",
+  "porcentaje_examen": "",
+  "practicas_obligatorias": "si/no/dudoso",
+  "evidencia": "",
+  "cumple": "si/no/dudoso",
+  "observaciones": ""
+}
