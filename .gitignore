@@ -1,4 +1,4 @@
-# Claves y configuración local
+# Claves y configuracion local
 .env
 *.env
 
@@ -6,7 +6,7 @@
 .venv/
 venv/
 
-# Caché de Python
+# Cache de Python
 __pycache__/
 *.pyc
 
@@ -20,6 +20,7 @@ outputs/resultados/*
 
 # Documentos originales o pesados
 *.pdf
+*.zip
 *.docx
 *.xlsx
-*.zip
+data/guias_originales_grandes/
