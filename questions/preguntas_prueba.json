@@ -1,0 +1,34 @@
+{
+  "preguntas": [
+    {
+      "id_pregunta": "4.19",
+      "tipo": "evaluacion",
+      "pregunta": "¿Qué asignaturas tienen simultáneamente examen final >40% y prácticas obligatorias?",
+      "instruccion_map": "Analiza solo la asignatura del PDF actual. Marca aporta_informacion = \"si\" solo si se cumplen a la vez estas dos condiciones: 1) hay examen final, examen global, prueba final o equivalente con peso estrictamente superior al 40%; 2) hay prácticas obligatorias o requisito equivalente claro. Superior al 40% significa >40%: un peso exactamente igual a 40% NO cumple. No basta con que existan prácticas, laboratorios o exámenes de prácticas; debe aparecer claramente que son obligatorios, no recuperables, requisito para aprobar, requisito para presentarse, asistencia obligatoria, entrega obligatoria, nota mínima obligatoria o condición equivalente. Si solo se cumple una de las dos condiciones, marca aporta_informacion = \"no\" y explica brevemente cuál falta. Si la guía no permite decidirlo con claridad, marca aporta_informacion = \"dudoso\"."
+    },
+    {
+      "id_pregunta": "4.20",
+      "tipo": "herramientas",
+      "pregunta": "¿Qué asignaturas requieren uso de software o herramientas técnicas específicas y cuáles son?",
+      "instruccion_map": "Analiza si la asignatura de este PDF requiere o menciona herramientas concretas usadas por la asignatura: lenguajes de programación, software de simulación, entornos de desarrollo, plataformas técnicas, herramientas de laboratorio, sistemas operativos, librerías, frameworks o herramientas técnicas específicas. Si aparecen, marca aporta_informacion = \"si\" y enumera cuáles son. No cuentes herramientas genéricas de docencia como Moodle, Zoom, Teams, correo electrónico o web de la asignatura, salvo que sean el objeto técnico específico de la asignatura. Si solo aparecen recursos docentes genéricos, marca aporta_informacion = \"no\". Si no se puede saber con claridad, marca aporta_informacion = \"dudoso\"."
+    },
+    {
+      "id_pregunta": "4.21",
+      "tipo": "evaluacion",
+      "pregunta": "¿Qué porcentaje de asignaturas del grado incluyen trabajo en grupo como parte de la evaluación?",
+      "instruccion_map": "Analiza si la asignatura de este PDF incluye trabajo en grupo, trabajo en equipo, presentación en grupo, proyecto en grupo o actividad grupal como parte de la evaluación o de una entrega evaluable. Si aparece una actividad evaluable grupal, marca aporta_informacion = \"si\". No cuentes competencias genéricas tipo \"trabajo en equipo\" si no hay una actividad evaluable asociada. No cuentes una simple mención a metodología colaborativa si no afecta a la evaluación. Si no aparece trabajo grupal evaluable, marca aporta_informacion = \"no\". Si no está claro, marca aporta_informacion = \"dudoso\"."
+    },
+    {
+      "id_pregunta": "4.10",
+      "tipo": "conocimientos_previos",
+      "pregunta": "¿Qué asignaturas requieren conocimientos previos obligatorios o recomendados?",
+      "instruccion_map": "Analiza solo la asignatura del PDF actual. Revisa la sección de conocimientos previos recomendados, requisitos previos, recomendaciones previas o apartados equivalentes. Marca aporta_informacion = \"si\" si la guía indica conocimientos previos concretos, asignaturas previas, competencias previas o contenidos específicos que se recomienda u obliga conocer antes de cursar la asignatura. Marca \"no\" si la guía indica explícitamente que no son necesarios conocimientos previos específicos, o si no aparecen requisitos o recomendaciones previas concretas. Marca \"dudoso\" si la información no está clara o el PDF no permite decidirlo. No inventes requisitos y no uses información de otras asignaturas."
+    },
+    {
+      "id_pregunta": "4.28",
+      "tipo": "contenido",
+      "pregunta": "¿Qué asignaturas mencionan explícitamente inteligencia artificial en su contenido?",
+      "instruccion_map": "Analiza si la asignatura de este PDF menciona explícitamente inteligencia artificial, IA, aprendizaje automático, machine learning, deep learning, redes neuronales, modelos generativos u otros términos claramente relacionados. Si aparece, marca aporta_informacion = \"si\" y copia la evidencia. No cuentes términos genéricos como algoritmos, datos, programación, optimización o estadística si no aparece una relación explícita con IA. Si no aparece una mención explícita relacionada con IA, marca aporta_informacion = \"no\". Si no se puede saber con claridad, marca aporta_informacion = \"dudoso\"."
+    }
+  ]
+}

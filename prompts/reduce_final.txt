@@ -1,8 +1,10 @@
-A partir de los resultados por asignatura, genera una respuesta final breve para la memoria.
+A partir de los resultados MAP de una unica pregunta, genera una respuesta final breve para la memoria.
 
-Separa la respuesta en tres grupos:
-1. Asignaturas que cumplen claramente ambas condiciones.
-2. Asignaturas dudosas que habría que revisar manualmente.
-3. Asignaturas que no cumplen.
+No anadas asignaturas ni datos que no aparezcan en los resultados de entrada. Si un caso es dudoso, mantenlo como dudoso.
 
-No añadas asignaturas que no aparezcan en los datos de entrada. Si un caso es dudoso, mantenlo como dudoso.
+Estructura la respuesta en:
+1. Respuesta global a la pregunta.
+2. Asignaturas o PDFs que aportan informacion relevante.
+3. Casos dudosos que conviene revisar manualmente.
+4. Casos sin informacion relevante.
+5. Limitaciones observadas.

@@ -1,25 +1,56 @@
-Analiza SOLO el PDF de esta asignatura.
+Analiza SOLO el PDF actual y SOLO la pregunta actual.
 
-Pregunta: ¿esta asignatura tiene simultáneamente examen final con peso superior al 40% y prácticas obligatorias?
+IMPORTANTE:
+- En la fase MAP recibes un unico PDF, normalmente de una unica asignatura.
+- No debes responder la pregunta global como si tuvieras todas las asignaturas delante.
+- No digas que no puedes responder porque solo ves una asignatura.
+- Precisamente MAP consiste en analizar una asignatura cada vez.
+- Tu tarea es decidir si la asignatura del PDF actual cumple o no cumple el criterio local indicado.
 
-Criterio:
-- "examen_final_mayor_40" = "si" solo si el examen final, examen escrito, prueba final o exámenes equivalentes superan el 40% de la nota.
-- Si aparece una prueba global, final o extraordinaria con 50%, 60%, 70%, 100%, etc., cuenta como examen final >40%.
-- "porcentaje_examen" debe indicar el porcentaje exacto encontrado. Si hay varios porcentajes relevantes, ponlos de forma breve.
-- "practicas_obligatorias" = "si" solo si las prácticas, laboratorio o proyecto práctico son obligatorios o necesarios para aprobar, presentarse o promediar.
-- "cumple_ambas_condiciones" = "si" solo si las dos condiciones anteriores son "si". Si alguna es "no", responde "no". Si falta información importante, responde "dudoso".
-- Si no está claro, responde "dudoso". Es mejor dejarlo dudoso que inventar.
-- Usa "no" solo cuando el documento deje claro que la condición no se cumple. Si el documento no lo dice o no lo encuentras, usa "dudoso".
-- Si hay un trabajo o proyecto, pero no está claro que sea una práctica obligatoria, explícalo en observaciones.
-- "evidencia" debe ser breve: máximo dos frases con los datos clave, sin copiar párrafos largos.
+Objetivo de la fase MAP:
+- Aplicar la instruccion local MAP a la asignatura del PDF actual.
+- Extraer una respuesta parcial breve y revisable.
+- Citar la evidencia minima necesaria para justificar la decision.
 
-Devuelve SOLO JSON válido con estos campos:
+Criterio para "aporta_informacion":
+- "si": la asignatura actual cumple el criterio local de la pregunta.
+- "no": la asignatura actual no cumple el criterio local de la pregunta.
+- "dudoso": no hay suficiente informacion, la guia es ambigua o no se puede decidir con seguridad.
+
+Reglas:
+- Sigue siempre la "Instruccion local MAP obligatoria" que aparece al final del prompt.
+- Si no esta claro, usa "dudoso".
+- Es mejor dejar un caso como dudoso que inventar.
+- No uses informacion de otros PDFs ni de otras asignaturas.
+- La evidencia debe ser breve, como maximo dos frases.
+- La respuesta parcial debe referirse solo al PDF actual.
+- El campo "confianza" debe ser "alta", "media" o "baja".
+- Los campos "curso", "asignatura", "asignatura_base" y "archivo" se calculan localmente por el programa. Puedes devolverlos vacios si no estas seguro.
+
+Comprobacion final obligatoria antes de devolver el JSON:
+- Revisa que "aporta_informacion" sea coherente con "respuesta_parcial", "evidencia" y "observaciones".
+- Si en la respuesta dices que la asignatura cumple el criterio, entonces "aporta_informacion" debe ser "si".
+- Si en la respuesta dices que la asignatura no cumple el criterio, entonces "aporta_informacion" debe ser "no".
+- Si no se puede decidir, entonces "aporta_informacion" debe ser "dudoso".
+- No puede haber contradicciones entre el texto y "aporta_informacion".
+- Para la pregunta 4.19: si hay examen final, examen global o prueba final estrictamente superior al 40% y ademas practicas obligatorias, no recuperables o requisito equivalente, entonces "aporta_informacion" debe ser "si".
+- Para la pregunta 4.19: si falta una de las dos condiciones, entonces "aporta_informacion" debe ser "no".
+- Para la pregunta 4.19: si no hay informacion suficiente, entonces "aporta_informacion" debe ser "dudoso".
+- Para la pregunta 4.19: si en observaciones escribes algo como "por tanto si cumple", el campo "aporta_informacion" debe ser "si".
+
+Devuelve SOLO JSON valido con estos campos:
 {
+  "curso": "",
   "asignatura": "",
-  "examen_final_mayor_40": "si/no/dudoso",
-  "porcentaje_examen": "",
-  "practicas_obligatorias": "si/no/dudoso",
-  "cumple_ambas_condiciones": "si/no/dudoso",
+  "asignatura_base": "",
+  "archivo": "",
+  "id_pregunta": "",
+  "tipo": "",
+  "pregunta": "",
+  "aporta_informacion": "si/no/dudoso",
+  "respuesta_parcial": "",
   "evidencia": "",
-  "observaciones": ""
+  "confianza": "alta/media/baja",
+  "observaciones": "",
+  "error": null
 }

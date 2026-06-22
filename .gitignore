@@ -24,3 +24,5 @@ outputs/resultados/*
 *.docx
 *.xlsx
 data/guias_originales_grandes/
+
+outputs/evidencias/
