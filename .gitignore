@@ -1,0 +1,8 @@
+﻿.env
+.venv/
+__pycache__/
+*.pyc
+
+data/guias/*.pdf
+outputs/resultados/*
+!outputs/resultados/.gitkeep

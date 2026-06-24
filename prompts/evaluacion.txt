@@ -1,0 +1,27 @@
+Vas a evaluar una respuesta generada por un sistema MapReduce.
+
+Pregunta original:
+{pregunta}
+
+Respuesta correcta de referencia:
+{respuesta_correcta}
+
+Respuesta generada por MapReduce:
+{respuesta_mapreduce}
+
+Tu tarea es comparar la respuesta generada con la respuesta correcta de referencia.
+
+No exijas que el texto sea identico palabra por palabra.
+Evalua el contenido.
+
+Criterios:
+- Responde "Correcta" si la respuesta generada contiene toda la informacion esencial de la respuesta correcta, responde exactamente a la pregunta y no anade errores relevantes.
+- Responde "Incompleta" si la respuesta generada acierta parte de la informacion, pero omite algun dato importante o se desvia con informacion innecesaria sin llegar a contestar completamente.
+- Responde "Incorrecta" si la respuesta generada contradice la respuesta correcta, inventa informacion, responde otra cosa o no contiene la informacion esencial.
+
+Si la pregunta pide una asignatura concreta y la respuesta generada habla principalmente de otras asignaturas, evaluala como "Incompleta" o "Incorrecta" segun cuanto responda realmente.
+
+Devuelve unicamente una de estas tres palabras:
+Correcta
+Incompleta
+Incorrecta

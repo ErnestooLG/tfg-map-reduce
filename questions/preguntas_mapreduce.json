@@ -1,0 +1,32 @@
+[
+  {
+    "id": "P03",
+    "numero_excel": 3,
+    "pregunta": "En que semestre se imparte la asignatura de Calculo?",
+    "respuesta_correcta_excel": "La asignatura de Calculo se imparte en el primer semestre."
+  },
+  {
+    "id": "P10",
+    "numero_excel": 10,
+    "pregunta": "Que porcentaje de la nota final corresponde a la evaluacion de laboratorio en la asignatura SSIT?",
+    "respuesta_correcta_excel": "En la asignatura SSIT, la evaluacion de laboratorio corresponde al 20% de la nota final. Esta parte se obtiene mediante la evaluacion de las practicas, concretamente a partir de las pruebas de seguimiento asociadas a las practicas de laboratorio."
+  },
+  {
+    "id": "P14",
+    "numero_excel": 14,
+    "pregunta": "Dime el titulo del tema 3 de la asignatura RDPR y como el indice de este tema",
+    "respuesta_correcta_excel": "En la asignatura RDPR, el tema 3 se titula Propagacion de ondas en medio natural. Su indice es: 3.1 Influencia del medio en la propagacion; 3.2 Propagacion por onda de superficie y ionosferica; 3.3 Propagacion por onda de espacio: efectos del suelo y la troposfera; 3.4 Propagacion en entornos complejos: rurales, suburbanos, urbanos e interiores."
+  },
+  {
+    "id": "P41",
+    "numero_excel": 41,
+    "pregunta": "Que asignaturas tienen simultaneamente examen final mayor del 40% y practicas obligatorias?",
+    "respuesta_correcta_excel": "Las asignaturas que cumplen simultaneamente tener un examen final o prueba escrita final con peso superior al 40% y practicas, laboratorio, proyecto, entregas o trabajos obligatorios son: ADSW, CDPS, CELT, COPT, CORE, DORE, ECOM, EDIG, EIMB, FGST, FIS1, FIS2, IGL2, ISST, ITCD, ORGE, PRG, RCMO, RDOR, RSRD, RSTC, SEGU, SSIT y TDSN. En estas asignaturas la parte escrita final o global supera el 40% de la nota y existe ademas una parte practica, de laboratorio, proyecto, entrega o trabajo obligatorio que forma parte de la evaluacion o es necesaria para superar la asignatura. Hay casos frontera en los que algunas pruebas escritas tienen exactamente el 40%; en esta respuesta se priorizan las asignaturas en las que la carga escrita final o global supera claramente el 40% o el conjunto de pruebas finales/globales supera ese umbral."
+  },
+  {
+    "id": "P46",
+    "numero_excel": 46,
+    "pregunta": "Que curso tiene mayor carga de evaluacion continua segun las guias docentes?",
+    "respuesta_correcta_excel": "Segun las guias docentes, el tercer curso y el cuarto curso son los que concentran mayor carga de evaluacion continua frente a los primeros cursos, donde predominan mas los examenes teoricos. Si hay que escoger uno, el tercer curso destaca como el curso con mayor carga practica y de evaluacion continua, porque incluye asignaturas con porcentajes muy altos de laboratorio, practicas o proyectos, como CDPS, SDG2, CELT o CORE. El cuarto curso tambien tiene una carga elevada de evaluacion continua, especialmente por asignaturas basadas en proyectos, PBL, trabajos en grupo y entregas, como ISST, DORE o RECO, pero el tercer curso es el que concentra algunos de los porcentajes practicos mas altos."
+  }
+]

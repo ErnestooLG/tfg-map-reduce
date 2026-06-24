@@ -1,0 +1,35 @@
+Estas analizando un unico PDF de una asignatura.
+
+Pregunta global:
+{pregunta}
+
+Tu tarea es revisar SOLO este PDF y decidir si contiene informacion util para responder exactamente a la pregunta.
+
+Reglas importantes:
+- Responde solo con informacion de este PDF.
+- No inventes nada.
+- Si la pregunta menciona una asignatura concreta por siglas o nombre, solo debes marcar informacion util si este PDF corresponde a esa asignatura.
+- La sigla de la asignatura es el nombre del PDF sin ".pdf". Por ejemplo, FGST.pdf corresponde a la asignatura FGST aunque el titulo completo sea Fundamentos de Gestion Empresarial.
+- Si este PDF no corresponde a la asignatura preguntada, responde que no hay informacion util.
+- No uses este PDF para responder de forma general sobre otras asignaturas.
+- Extrae unicamente los datos necesarios para contestar la pregunta, no un resumen completo del PDF.
+- Si el PDF corresponde a la asignatura pero no encuentras datos concretos para responder, hay_informacion_util debe ser "no".
+
+Reglas especificas para preguntas sobre evaluacion:
+- No te quedes solo en los porcentajes.
+- Busca expresamente apartados llamados Evaluacion, Evaluacion progresiva, Prueba evaluacion global, sistema de evaluacion, trabajo en equipo, examen final, notas minimas, convocatoria ordinaria y convocatoria extraordinaria.
+- Busca tambien condiciones, notas minimas, obligatoriedad, entregas intermedias, requisitos para poder presentar entregas finales, recuperacion, traslado de notas, trabajos nuevos u originales y cualquier diferencia entre evaluacion progresiva y global.
+- Si la pregunta compara evaluacion progresiva y global, debes extraer todas las diferencias relevantes que aparezcan en el PDF, aunque esten en notas, observaciones o texto explicativo fuera de la tabla.
+- En preguntas que comparan evaluacion progresiva y global, respuesta_map debe incluir dos partes claras: "Evaluacion progresiva" y "Evaluacion global".
+- No termines la respuesta despues de la evaluacion progresiva: busca tambien la seccion de evaluacion global y sus consideraciones.
+- No respondas que no hay informacion sobre evaluacion progresiva/global sin haber revisado esos apartados.
+- Antes de responder sobre evaluacion progresiva/global, comprueba uno por uno si aparecen: porcentajes de trabajo/examen, nota minima, entrega intermedia, validacion APTO, requisitos para entregar la version final, trabajo nuevo, trabajo original, trabajo diferente y si se puede trasladar o no una nota anterior.
+- Si alguno de esos puntos aparece en el PDF, incluyelo en respuesta_map.
+
+Devuelve SOLO JSON valido con esta estructura exacta:
+
+{
+  "hay_informacion_util": "si/no/dudoso",
+  "respuesta_map": "respuesta parcial basada solo en este PDF",
+  "evidencia": "fragmento o resumen breve que justifica la respuesta"
+}
