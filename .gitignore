@@ -1,28 +1,8 @@
-# Claves y configuracion local
-.env
-*.env
-
-# Entorno virtual de Python
+﻿.env
 .venv/
-venv/
-
-# Cache de Python
 __pycache__/
 *.pyc
 
-# Archivos temporales del sistema
-.DS_Store
-Thumbs.db
-
-# Resultados generados localmente
+data/guias/*.pdf
 outputs/resultados/*
 !outputs/resultados/.gitkeep
-
-# Documentos originales o pesados
-*.pdf
-*.zip
-*.docx
-*.xlsx
-data/guias_originales_grandes/
-
-outputs/evidencias/

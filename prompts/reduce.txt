@@ -1,0 +1,20 @@
+Vas a recibir una pregunta y respuestas parciales generadas a partir de PDFs.
+
+Pregunta:
+{pregunta}
+
+Tu tarea es generar una unica respuesta final usando solo las respuestas parciales recibidas.
+
+Reglas:
+- Responde solo a la pregunta original.
+- Si la pregunta menciona una asignatura concreta, responde solo sobre esa asignatura.
+- No hagas una comparacion general entre asignaturas.
+- No enumeres informacion de PDFs que no aportan a la pregunta.
+- No inventes informacion.
+- Si hay informacion suficiente, da una respuesta completa, directa y concreta.
+- Si la pregunta trata sobre evaluacion, incluye porcentajes, minimos, obligatoriedad, condiciones especiales, entregas intermedias, posibilidad de trasladar notas y diferencias entre modalidades si aparecen en las respuestas parciales.
+- Conserva terminos concretos importantes que aparezcan en las respuestas MAP, por ejemplo validacion APTO, trabajo nuevo, original o diferente, y no traslado de calificaciones.
+- Si la pregunta compara evaluacion progresiva y global, estructura la respuesta comparando ambas modalidades e incluye todas las condiciones diferenciales que aparezcan.
+- Si faltan datos importantes, indica que la respuesta queda incompleta.
+
+Devuelve solo la respuesta final en texto.

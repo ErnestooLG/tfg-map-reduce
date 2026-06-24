@@ -1,172 +1,179 @@
-# Piloto MapReduce TFG
+# Prototipo MapReduce TFG
 
-Este proyecto implementa un flujo MapReduce sencillo para validar cinco preguntas reales sobre guias PDF de asignaturas.
+Este repositorio contiene un prototipo sencillo para probar una idea concreta del TFG: usar MapReduce con Gemini sobre guias docentes en PDF.
 
-La validacion se hace pregunta por pregunta. El programa selecciona una pregunta, ejecuta el MAP sobre todos los PDFs usando solo esa pregunta, ejecuta el REDUCE de esa pregunta y despues pasa a la siguiente. Asi Gemini se concentra en una sola tarea y los resultados parciales son mas faciles de revisar.
+La idea es:
 
-## Flujo
+1. Se seleccionan cinco preguntas reales que Gemini fallo cuando recibia todos los documentos.
+2. En MAP, Gemini procesa todos los PDFs y responde la pregunta mirando cada PDF de asignatura por separado.
+3. En REDUCE, Gemini combina las respuestas MAP marcadas como utiles.
+4. En EVALUACION, Gemini compara la respuesta final con la respuesta correcta de referencia.
+5. El programa guarda la evaluacion `Correcta`, `Incompleta` o `Incorrecta`.
 
-1. El script busca los PDFs configurados en `config.yaml`.
-2. Lee las preguntas desde `questions/preguntas_prueba.json`.
-3. Para cada pregunta seleccionada, ejecuta la fase MAP sobre todos los PDFs.
-4. Cada PDF genera un JSON parcial en la carpeta propia de esa pregunta.
-5. Se generan `resultados_map.json` y `resultados_map.csv` para esa pregunta.
-6. La fase REDUCE lee solo los JSON parciales de esa pregunta y genera `reduce_final.md`.
-7. Opcionalmente, `--reduce-llm` genera tambien `reduce_final_llm.md`.
-8. Al final se genera `outputs/resultados/resumen_validacion.csv` y `outputs/resultados/resumen_validacion.md`.
+La metrica importante no es que el programa ejecute sin errores. Eso solo es una comprobacion tecnica. Lo importante es revisar si la respuesta final MapReduce acierta el contenido de la respuesta correcta.
 
-## Archivos principales
-
-- `config.yaml`: ruta de los PDFs y modelo de Gemini.
-- `questions/preguntas_prueba.json`: cinco preguntas de validacion.
-- `.env.example`: ejemplo para crear el archivo `.env` local.
-- `requirements.txt`: dependencias necesarias.
-- `run_map_reduce.py`: script principal.
-- `prompts/map_asignatura.txt`: prompt MAP usado con una unica pregunta cada vez.
-- `prompts/reduce_final.txt`: prompt opcional para el reduce con LLM.
-- `outputs/resultados/`: carpeta local de resultados generados.
-
-## Instalacion
-
-Desde la carpeta del proyecto:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+## Preparar Entorno
 
 En Windows PowerShell:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-## Configuracion
+Crear el archivo `.env`:
 
-La ruta de las guias se mantiene en `config.yaml`:
-
-```yaml
-ruta_pdfs_por_asignatura: "data/guias"
+```powershell
+Copy-Item .env.example .env
+notepad .env
 ```
 
-Los PDFs se colocan directamente dentro de:
+Dentro de `.env` hay que poner la clave de Gemini:
+
+```text
+GEMINI_API_KEY=tu_clave_real
+GEMINI_MODEL=gemini-2.5-flash-lite
+```
+
+## PDFs
+
+Los PDFs de las guias se colocan en:
 
 ```text
 data/guias/
 ```
 
-El repositorio incluye `data/guias/.gitkeep` para que la carpeta exista al clonarlo, pero no incluye PDFs reales. Los PDFs, `.env`, `.venv` y los resultados generados no deben subirse al repositorio.
+No se suben al repositorio. La carpeta se mantiene con `.gitkeep`.
 
-El campo `curso` se conserva como metadato local. Con una carpeta plana normalmente saldra como `sin_curso`, y no es importante para las preguntas finales.
+Los PDFs partidos, como `CDPS_parte1.pdf`, `CDPS_parte2.pdf`, `IWEB_parte1.pdf` e `IWEB_parte2.pdf`, se procesan como PDFs independientes en MAP.
 
-El campo `asignatura_base` se calcula localmente a partir del nombre del archivo para no contar dos veces asignaturas divididas en partes. Por ejemplo, `CDPS_parte1` y `CDPS_parte2` se cuentan como `CDPS`; `IWEB_parte1` y `IWEB_parte2` se cuentan como `IWEB`.
+## Preguntas
 
-La clave real de Gemini va solo en un archivo `.env` local:
+Las cinco preguntas estan en:
 
 ```text
-GEMINI_API_KEY=tu_clave_real
+questions/preguntas_mapreduce.json
 ```
 
-## Ejemplos de uso
+Cada pregunta incluye tambien la respuesta correcta del Excel. Esa respuesta no se pasa a Gemini en MAP ni en REDUCE; solo se usa despues, en la fase de EVALUACION.
 
-Comprobar preguntas y PDFs sin llamar a Gemini:
+## Uso
 
-```bash
+Ver preguntas y PDFs detectados sin llamar a Gemini:
+
+```powershell
 python run_map_reduce.py --dry-run
 ```
 
-Ejecutar las cinco preguntas una detras de otra, con un worker:
+Probar con una pregunta y pocos PDFs:
 
-```bash
-python run_map_reduce.py --workers 1
+```powershell
+python run_map_reduce.py --phase all --limit-preguntas 1 --limit-pdfs 2 --workers 1
 ```
 
-Ejecutar solo la pregunta 4.19:
+Ejecutar todo:
 
-```bash
-python run_map_reduce.py --question-id 4.19 --workers 1
+```powershell
+python run_map_reduce.py --phase all --workers 1
 ```
 
-Probar una pregunta con solo 5 PDFs:
+Ejecutar solo MAP:
 
-```bash
-python run_map_reduce.py --question-id 4.19 --limit 5 --workers 1
-```
-
-Ejecutar solo MAP para todas las preguntas:
-
-```bash
+```powershell
 python run_map_reduce.py --phase map --workers 1
 ```
 
-Ejecutar solo REDUCE usando los JSON parciales ya generados:
+Ejecutar solo REDUCE con resultados MAP ya existentes:
 
-```bash
+```powershell
 python run_map_reduce.py --phase reduce
 ```
 
-Ejecutar el reduce local y, ademas, una redaccion opcional con Gemini:
+Ejecutar solo EVALUACION con resultados REDUCE ya existentes:
 
-```bash
-python run_map_reduce.py --question-id 4.19 --phase reduce --reduce-llm
+```powershell
+python run_map_reduce.py --phase evaluacion
 ```
 
-## Opciones utiles
+Opciones utiles:
 
-- `--questions-file questions/preguntas_prueba.json`: archivo JSON de preguntas.
-- `--question-id 4.19`: ejecuta una unica pregunta.
-- `--all-questions`: ejecuta todas las preguntas del JSON, igual que el comportamiento por defecto.
-- `--limit N`: procesa solo los primeros `N` PDFs por pregunta.
-- `--workers N`: numero de PDFs procesados en paralelo durante la fase MAP.
-- `--dry-run`: lista preguntas y PDFs sin llamar a Gemini.
-- `--phase all`: ejecuta MAP y REDUCE para cada pregunta seleccionada.
-- `--phase map`: ejecuta solo la fase MAP.
-- `--phase reduce`: ejecuta solo la fase REDUCE leyendo parciales existentes.
-- `--reduce-llm`: mantiene el reduce local y anade una redaccion opcional con Gemini.
+- `--phase map`: ejecuta solo MAP.
+- `--phase reduce`: ejecuta solo REDUCE.
+- `--phase evaluacion`: ejecuta solo la evaluacion con Gemini.
+- `--phase all`: ejecuta MAP, REDUCE y EVALUACION.
+- `--limit-preguntas 1`: procesa solo la primera pregunta.
+- `--limit-pdfs 5`: procesa solo los primeros cinco PDFs.
+- `--workers 3`: procesa varios PDFs en paralelo durante MAP.
 
-Si no se indica `--question-id`, el programa ejecuta todas las preguntas de validacion.
+Por defecto se usa `--phase all` y `--workers 1`.
 
-## Salidas generadas
+## Resultados
 
-Cada pregunta tiene su propia carpeta:
+Las respuestas parciales MAP se guardan en:
 
 ```text
-outputs/resultados/por_pregunta/
-  4_19/
-    map/
-      ADCT.json
-      ADSW.json
-      ...
-    resultados_map.json
-    resultados_map.csv
-    reduce_final.md
-    reduce_final_llm.md
-
-  4_20/
-    map/
-    resultados_map.json
-    resultados_map.csv
-    reduce_final.md
+outputs/resultados/map/
 ```
 
-El resumen general se guarda en:
+Ejemplo:
 
 ```text
-outputs/resultados/resumen_validacion.csv
-outputs/resultados/resumen_validacion.md
+outputs/resultados/map/P03_CALC.json
 ```
 
-con estas columnas en el CSV:
+Las respuestas finales REDUCE se guardan en:
 
 ```text
-id_pregunta,tipo,pregunta,total_pdfs,relevantes,dudosos,sin_informacion,errores,archivo_reduce
+outputs/resultados/reduce/
 ```
 
-La carpeta `outputs/resultados/` contiene resultados generados localmente y no se sube al repositorio.
+Ejemplo:
 
-## Entrega
+```text
+outputs/resultados/reduce/P03.json
+```
 
-El codigo permite probar primero con `--limit` y despues procesar todas las guias quitando ese limite. La diferencia importante respecto al prototipo inicial es que ahora el flujo multipregunta no mezcla tareas: cada ejecucion MAP recibe una sola pregunta, el REDUCE solo ve resultados de esa misma pregunta y la revision queda separada por carpetas.
+Cada JSON final incluye:
+
+- `respuesta_final_mapreduce`
+- `respuesta_correcta_excel`
+- `evaluacion_gemini`
+- `error_evaluacion`
+- `evaluacion_manual`
+- `comentario_manual`
+
+Tambien se generan:
+
+```text
+outputs/resultados/resultados_finales.json
+outputs/resultados/resultados_finales.csv
+outputs/resultados/resumen_evaluacion.csv
+```
+
+`resultados_finales.csv` contiene la respuesta MapReduce, la respuesta correcta del Excel y la evaluacion generada por Gemini.
+
+`resumen_evaluacion.csv` incluye `evaluacion_gemini` y queda preparado para revision manual:
+
+```text
+Correcta
+Incompleta
+Incorrecta
+```
+
+## Evaluacion
+
+Despues de ejecutar REDUCE, Gemini compara cada `respuesta_final_mapreduce` con `respuesta_correcta_excel`.
+
+Gemini debe devolver solo:
+
+- `Correcta`
+- `Incompleta`
+- `Incorrecta`
+
+Despues se puede revisar manualmente en los campos:
+
+- `evaluacion_manual`
+- `comentario_manual`
+
+Esto permite defender en la memoria que el prototipo no se evalua por "ejecutar sin errores", sino por la calidad de las respuestas finales respecto a las respuestas correctas del Excel.
